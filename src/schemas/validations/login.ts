@@ -6,3 +6,5 @@ export const LoginSchema = z.object({
     .string()
     .nonempty({ error: "A senha deve ter no mínimo 8 caracteres." })
 })
+
+export type LoginSchemaType = z.infer<typeof LoginSchema>

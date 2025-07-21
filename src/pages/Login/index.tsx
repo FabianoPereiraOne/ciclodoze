@@ -16,13 +16,14 @@ import {
   FormMessage
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
-import { LoginSchema } from "@/types/login"
+import { LoginSchema, type LoginSchemaType } from "@/schemas/validations/login"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
+import { LuLogIn } from "react-icons/lu"
 import { Link } from "react-router-dom"
 
 export const Login = () => {
-  const form = useForm({
+  const form = useForm<LoginSchemaType>({
     resolver: zodResolver(LoginSchema),
     defaultValues: {
       email: "",
@@ -33,7 +34,7 @@ export const Login = () => {
   const onSubmit = () => {}
 
   return (
-    <div className='w-full h-screen flex items-center justify-center flex-col gap-2 p-[20px] relative'>
+    <div className='w-full min-h-screen flex items-center justify-center flex-col gap-2 p-[20px] md:p-[36px] relative'>
       <Link
         to='/'
         className='absolute top-8 left-[50%] translate-x-[-50%] md:left-12 md:translate-x-0'
@@ -41,7 +42,7 @@ export const Login = () => {
         <img src='/favicon.ico' className='max-w-[48px]' alt='Logo' />
       </Link>
 
-      <Card className='w-full max-w-[400px] py-8'>
+      <Card className='w-full max-w-[450px] py-8'>
         <CardHeader>
           <CardTitle className='text-center text-2xl'>
             Acesse sua Conta
@@ -53,7 +54,7 @@ export const Login = () => {
         </CardHeader>
         <CardContent>
           <Form {...form}>
-            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8'>
+            <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6'>
               <FormField
                 control={form.control}
                 name='email'
@@ -92,9 +93,10 @@ export const Login = () => {
                 )}
               />
               <Button
-                className='w-full hover:bg-blue-500 hover:text-white cursor-pointer'
+                className='w-full flex justify-center items-center gap-1 hover:bg-blue-500 hover:text-white cursor-pointer'
                 type='submit'
               >
+                <LuLogIn />
                 Entrar
               </Button>
             </form>
