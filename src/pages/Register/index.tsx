@@ -25,6 +25,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
+import { useCreateUser } from "@/hooks/useCreateUser"
 import {
   RegisterSchema,
   type RegisterSchemaType
@@ -33,8 +34,10 @@ import { zodResolver } from "@hookform/resolvers/zod"
 import { useForm } from "react-hook-form"
 import { LuUserPlus } from "react-icons/lu"
 import { Link } from "react-router-dom"
+import { toast } from "sonner"
 
 export const Register = () => {
+  const { mutateAsync } = useCreateUser()
   const form = useForm<RegisterSchemaType>({
     resolver: zodResolver(RegisterSchema),
     defaultValues: {
@@ -46,7 +49,18 @@ export const Register = () => {
     }
   })
 
-  const onSubmit = () => {}
+  const onSubmit = async (data: RegisterSchemaType) => {
+    const response = await mutateAsync(data)
+    const hasToken = response?.token
+
+    if (hasToken) {
+      toast.success("Conta criada com sucesso.")
+
+      return setTimeout(() => (window.location.href = "/dash"), 500)
+    } else {
+      toast.error("Não foi possível criar sua conta.")
+    }
+  }
 
   return (
     <div className='w-full min-h-screen flex items-center justify-center flex-col gap-2 p-[20px] md:p-[36px] relative'>
