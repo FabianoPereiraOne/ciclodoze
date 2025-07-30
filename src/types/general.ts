@@ -10,4 +10,5 @@ export type TokenProps = {
   email: string
   photo: string
   type: string
+  isActive: boolean
 }

@@ -5,22 +5,23 @@ import { useMutation } from "@tanstack/react-query"
 export const useCreateUser = () => {
   return useMutation({
     mutationFn: async (data: RegisterSchemaType) => {
-      try {
-        const result = await fetch("http://localhost:3333/users", {
-          method: "POST",
-          headers: {
-            "Content-type": "application/json"
-          },
-          body: JSON.stringify(data)
-        })
+      const result = await fetch("http://localhost:3333/users", {
+        method: "POST",
+        credentials: "include",
+        headers: {
+          "Content-type": "application/json"
+        },
+        body: JSON.stringify(data)
+      })
 
-        if (result?.status !== 201) return
-
-        const response: RegisterTypeResponse = await result.json()
-        return response
-      } catch (error) {
-        console.error(error)
+      if (!result.ok) {
+        const errorData = await result.json()
+        throw new Error(errorData?.message)
       }
+
+      const response: RegisterTypeResponse = await result.json()
+
+      return response
     }
   })
 }

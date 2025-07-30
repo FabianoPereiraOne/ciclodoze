@@ -5,7 +5,7 @@ import { LoadingScreen } from "./components/LoadingScreen"
 import type { MiddlewareProps, TokenProps } from "./types/general"
 
 export default function Middleware({ element, roles }: MiddlewareProps) {
-  const token = localStorage.getItem("token") ?? ""
+  const [token, setToken] = useState(() => localStorage.getItem("token") ?? "")
   const { isExpired, decodedToken } = useJwt<TokenProps>(token)
   const location = useLocation()
   const navigate = useNavigate()
@@ -13,24 +13,47 @@ export default function Middleware({ element, roles }: MiddlewareProps) {
 
   const publicPaths = ["/", "/esqueceu-senha", "/criar-conta", "/ativar-conta"]
   const pathname = location.pathname
-  const type = decodedToken?.type ?? ""
-  const isAuthorized = roles?.includes(type)
 
   useEffect(() => {
-    if (!token || isExpired) {
-      localStorage.removeItem("token")
+    const handleStorageChange = () => {
+      setToken(localStorage.getItem("token") ?? "")
+    }
+    window.addEventListener("storage", handleStorageChange)
+    return () => window.removeEventListener("storage", handleStorageChange)
+  }, [])
+
+  useEffect(() => {
+    if (token && !decodedToken) return
+
+    const type = decodedToken?.type
+    const isActive = decodedToken?.isActive
+    const isAuthorized = roles?.includes(type ?? "")
+
+    if (!token || isExpired || !isActive) {
+      //localStorage.removeItem("token")
+      setToken("")
 
       if (!publicPaths.includes(pathname)) {
         navigate("/")
-        return
       }
-    } else if (publicPaths.includes(pathname) || !isAuthorized) {
+      setLoading(false)
+      return
+    }
+
+    if (publicPaths.includes(pathname)) {
       navigate("/dash")
+      setLoading(false)
+      return
+    }
+
+    if (!isAuthorized) {
+      navigate("/dash")
+      setLoading(false)
       return
     }
 
     setLoading(false)
-  }, [token, isExpired, pathname, isAuthorized, navigate])
+  }, [token, isExpired, decodedToken, pathname, roles, navigate])
 
   if (loading) {
     return <LoadingScreen />
