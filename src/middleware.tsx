@@ -28,9 +28,9 @@ export default function Middleware({ element, roles }: MiddlewareProps) {
     const type = decodedToken?.type
     const isActive = decodedToken?.isActive
     const isAuthorized = roles?.includes(type ?? "")
-
+    console.log(decodedToken)
     if (!token || isExpired || !isActive) {
-      //localStorage.removeItem("token")
+      localStorage.removeItem("token")
       setToken("")
 
       if (!publicPaths.includes(pathname)) {

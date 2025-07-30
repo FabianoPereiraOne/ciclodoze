@@ -37,6 +37,9 @@ export const ActiveAccount = () => {
       localStorage.setItem("token", token)
 
       toast.success("Conta ativada com sucesso!")
+      setTimeout(() => {
+        window.location.href = "/dash"
+      }, 1000)
     } catch (err: any) {
       setError(true)
       toast.error("Não foi possível ativar sua conta.")
