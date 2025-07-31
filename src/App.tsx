@@ -18,7 +18,6 @@ export const App = () => {
           path='/dash'
           element={<Middleware element={<Dash />} roles={FullAccess} />}
         />
-        {/* <Route path='*' element={<Login />} /> */}
       </Routes>
     </BrowserRouter>
   )

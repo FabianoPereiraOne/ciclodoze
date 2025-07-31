@@ -2,21 +2,22 @@ import { useEffect, useState } from "react"
 import { useJwt } from "react-jwt"
 import { useLocation, useNavigate } from "react-router-dom"
 import { LoadingScreen } from "./components/LoadingScreen"
+import { useAuth } from "./context/AuthContext"
 import type { MiddlewareProps, TokenProps } from "./types/general"
 
 export default function Middleware({ element, roles }: MiddlewareProps) {
-  const [token, setToken] = useState(() => localStorage.getItem("token") ?? "")
+  const { changeToken, token } = useAuth()
+  const [loading, setLoading] = useState(true)
   const { isExpired, decodedToken } = useJwt<TokenProps>(token)
+  const { changeUser } = useAuth()
   const location = useLocation()
   const navigate = useNavigate()
-  const [loading, setLoading] = useState(true)
-
   const publicPaths = ["/", "/esqueceu-senha", "/criar-conta", "/ativar-conta"]
   const pathname = location.pathname
 
   useEffect(() => {
     const handleStorageChange = () => {
-      setToken(localStorage.getItem("token") ?? "")
+      changeToken(localStorage.getItem("token") ?? "")
     }
     window.addEventListener("storage", handleStorageChange)
     return () => window.removeEventListener("storage", handleStorageChange)
@@ -28,10 +29,17 @@ export default function Middleware({ element, roles }: MiddlewareProps) {
     const type = decodedToken?.type
     const isActive = decodedToken?.isActive
     const isAuthorized = roles?.includes(type ?? "")
-    console.log(decodedToken)
+    changeUser({
+      name: decodedToken?.name,
+      email: decodedToken?.email,
+      photo: decodedToken?.photo,
+      type: decodedToken?.type,
+      isActive: decodedToken?.isActive
+    })
+
     if (!token || isExpired || !isActive) {
       localStorage.removeItem("token")
-      setToken("")
+      changeToken("")
 
       if (!publicPaths.includes(pathname)) {
         navigate("/")
