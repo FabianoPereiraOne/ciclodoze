@@ -12,3 +12,7 @@ export type TokenProps = {
   type: string
   isActive: boolean
 }
+
+export type GeneralTypeResponse = {
+  message: string
+}

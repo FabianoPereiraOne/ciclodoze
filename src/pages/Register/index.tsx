@@ -229,6 +229,7 @@ export const Register = () => {
                   )}
                 />
                 <Button
+                  disabled={isPending}
                   className='w-full flex justify-center items-center gap-1 hover:bg-blue-500 hover:text-white cursor-pointer'
                   type='submit'
                 >

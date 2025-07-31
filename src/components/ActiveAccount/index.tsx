@@ -8,17 +8,19 @@ import {
 } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { useActiveAccount } from "@/hooks/useActiveAccount"
+import { useVerifyCode } from "@/hooks/useVerifyCode"
 import { cn } from "@/lib/utils"
 import { Loader2 } from "lucide-react"
 import { useRef, useState, type KeyboardEvent } from "react"
 import { LuUserCheck } from "react-icons/lu"
 import { toast } from "sonner"
 
-export const ActiveAccount = () => {
+export const ActiveAccount = ({ onCallback }: { onCallback?: () => void }) => {
   const [code, setCode] = useState<string[]>(Array(6).fill(""))
   const [error, setError] = useState(false)
   const inputRefs = useRef<(HTMLInputElement | null)[]>([])
   const { mutateAsync, isPending } = useActiveAccount()
+  const { mutateAsync: mutateAsyncVerifyCode } = useVerifyCode()
 
   const handlerVerifyCode = async () => {
     const fullCode = code.join("")
@@ -30,19 +32,20 @@ export const ActiveAccount = () => {
 
     try {
       const response = await mutateAsync({ code: fullCode })
+      const message = response?.message ?? ""
       const token = response?.token
 
       setCode(Array(6).fill(""))
       setError(false)
       localStorage.setItem("token", token)
 
-      toast.success("Conta ativada com sucesso!")
+      toast.success(message)
       setTimeout(() => {
         window.location.href = "/dash"
       }, 1000)
-    } catch (err: any) {
+    } catch (error: any) {
       setError(true)
-      toast.error("Não foi possível ativar sua conta.")
+      toast.error(error?.message ?? "")
     }
   }
 
@@ -87,6 +90,29 @@ export const ActiveAccount = () => {
     inputRefs.current[lastIndex]?.focus()
   }
 
+  const handlerVerifyCodeRecovery = async () => {
+    const fullCode = code.join("")
+
+    if (fullCode?.length < 6) {
+      setError(true)
+      return toast.error("Preencha todos os campos!")
+    }
+
+    try {
+      const response = await mutateAsyncVerifyCode({ code: fullCode })
+      const message = response?.message ?? ""
+
+      setCode(Array(6).fill(""))
+      setError(false)
+      toast.success(message)
+
+      if (onCallback) onCallback()
+    } catch (error: any) {
+      setError(true)
+      toast.error(error?.message ?? "")
+    }
+  }
+
   return (
     <Card className='w-full max-w-[450px] py-8'>
       <CardHeader>
@@ -119,9 +145,10 @@ export const ActiveAccount = () => {
         </div>
 
         <Button
+          disabled={isPending}
           className='w-full mt-8 mx-auto sm:max-w-[80%] flex justify-center items-center gap-1 hover:bg-blue-500 hover:text-white cursor-pointer'
           type='button'
-          onClick={handlerVerifyCode}
+          onClick={!!onCallback ? handlerVerifyCodeRecovery : handlerVerifyCode}
         >
           {isPending ? (
             <>
