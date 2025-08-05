@@ -12,3 +12,5 @@ export type User = {
   type?: string
   isActive?: boolean
 }
+
+export type Roles = "ADMIN" | "USER" | "TEACHER" | "FINANCE" | "MARKETING"

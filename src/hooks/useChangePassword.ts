@@ -1,10 +1,11 @@
+import { envSchema } from "@/env"
 import type { GeneralTypeResponse } from "@/types/general"
 import { useMutation } from "@tanstack/react-query"
 
 export const useChangePassword = () => {
   return useMutation({
     mutationFn: async ({ password }: { password: string }) => {
-      const result = await fetch("http://localhost:3333/change-password", {
+      const result = await fetch(`${envSchema.API_URL}/change-password`, {
         method: "POST",
         credentials: "include",
         headers: {

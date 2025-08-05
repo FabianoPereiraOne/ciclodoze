@@ -1,10 +1,11 @@
+import { envSchema } from "@/env"
 import type { ActiveAccountResponse } from "@/types/activeAccount"
 import { useMutation } from "@tanstack/react-query"
 
 export const useActiveAccount = () => {
   return useMutation({
     mutationFn: async ({ code }: { code: string }) => {
-      const result = await fetch("http://localhost:3333/active-account", {
+      const result = await fetch(`${envSchema.API_URL}/active-account`, {
         method: "POST",
         credentials: "include",
         headers: {

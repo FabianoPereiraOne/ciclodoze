@@ -1,10 +1,11 @@
+import { envSchema } from "@/env"
 import type { GeneralTypeResponse } from "@/types/general"
 import { useMutation } from "@tanstack/react-query"
 
 export const useForgot = () => {
   return useMutation({
     mutationFn: async ({ email }: { email: string }) => {
-      const result = await fetch("http://localhost:3333/forgot", {
+      const result = await fetch(`${envSchema.API_URL}/forgot`, {
         method: "POST",
         credentials: "include",
         headers: {

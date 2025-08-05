@@ -1,4 +1,9 @@
-import { BookOpen, CalendarCheck, LayoutDashboard } from "lucide-react"
+import {
+  BookOpen,
+  CalendarCheck,
+  LayoutDashboard,
+  Settings
+} from "lucide-react"
 
 export const pagesSidebar = [
   {
@@ -42,5 +47,13 @@ export const pagesSidebar = [
         url: "/dash/estudos/visao-geral"
       }
     ]
+  }
+]
+
+export const pagesAdminSidebar = [
+  {
+    title: "Configurações",
+    url: "/dash/admin/gerenciar",
+    icon: Settings
   }
 ]

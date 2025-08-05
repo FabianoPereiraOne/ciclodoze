@@ -1,3 +1,4 @@
+import { envSchema } from "@/env"
 import { useMutation } from "@tanstack/react-query"
 
 type SignResponseType = {
@@ -15,7 +16,7 @@ export const useSignUser = () => {
       email: string
       password: string
     }) => {
-      const result = await fetch("http://localhost:3333/sign", {
+      const result = await fetch(`${envSchema.API_URL}/sign`, {
         method: "POST",
         credentials: "include",
         headers: {

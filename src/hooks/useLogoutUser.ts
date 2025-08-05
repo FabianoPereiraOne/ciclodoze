@@ -1,9 +1,10 @@
+import { envSchema } from "@/env"
 import { useMutation } from "@tanstack/react-query"
 
 export const useLogoutUser = () => {
   return useMutation({
     mutationFn: async () => {
-      const result = await fetch("http://localhost:3333/logout", {
+      const result = await fetch(`${envSchema.API_URL}/logout`, {
         method: "GET",
         credentials: "include"
       })
