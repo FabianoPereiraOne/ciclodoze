@@ -1,14 +1,20 @@
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogTrigger } from "@/components/ui/dialog"
 import { TabsContent } from "@/components/ui/tabs"
+import type { dataType } from "@/types/areas"
 import { useState } from "react"
 import { LuPlus } from "react-icons/lu"
 import { DialogAdd } from "./components/DialogAdd"
+import { DialogUpdate } from "./components/DialogUpdate"
 import { ListingAreas } from "./components/ListingAreas"
 
 export const TabAreas = () => {
   const [open, setOpen] = useState(false)
-  const toggleDialog = () => setOpen(false)
+  const [update, setUpdate] = useState(false)
+  const [data, setData] = useState<null | dataType>(null)
+
+  const toggleDialog = () => setOpen(!open)
+  const toggleDialogUpdate = () => setUpdate(!update)
 
   return (
     <TabsContent value='areas' className='space-y-6'>
@@ -32,7 +38,16 @@ export const TabAreas = () => {
             <DialogAdd toggleDialog={toggleDialog} />
           </Dialog>
         </div>
-        <ListingAreas />
+        <ListingAreas
+          fcData={setData}
+          toggleDialogUpdate={toggleDialogUpdate}
+        />
+        <DialogUpdate
+          data={data}
+          toggleDialog={toggleDialogUpdate}
+          update={update}
+          setUpdate={setUpdate}
+        />
       </div>
     </TabsContent>
   )

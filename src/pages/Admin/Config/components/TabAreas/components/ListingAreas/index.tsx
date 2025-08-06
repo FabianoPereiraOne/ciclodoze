@@ -37,10 +37,16 @@ import {
 } from "@/components/ui/table"
 import { useDeleteArea } from "@/hooks/useDeleteArea"
 import { useGetAreas } from "@/hooks/useGetAreas"
-import type { AreaType } from "@/types/areas"
+import type { AreaType, dataType } from "@/types/areas"
 import { toast } from "sonner"
 
-export const columns: ColumnDef<AreaType>[] = [
+export const columns = ({
+  fcData,
+  toggleDialogUpdate
+}: {
+  fcData: (value: null | dataType) => void
+  toggleDialogUpdate: () => void
+}): ColumnDef<AreaType>[] => [
   {
     accessorKey: "id",
     header: "ID",
@@ -84,6 +90,17 @@ export const columns: ColumnDef<AreaType>[] = [
         }
       }
 
+      const handlerEditArea = () => {
+        fcData({
+          id: row?.getValue("id"),
+          isActive: row?.getValue("isActive"),
+          name: row?.getValue("name"),
+          access: row?.getValue("access")
+        })
+
+        toggleDialogUpdate()
+      }
+
       return (
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
@@ -95,7 +112,10 @@ export const columns: ColumnDef<AreaType>[] = [
           <DropdownMenuContent align='end'>
             <DropdownMenuLabel>Ações</DropdownMenuLabel>
             <DropdownMenuSeparator />
-            <DropdownMenuItem className='cursor-pointer'>
+            <DropdownMenuItem
+              onClick={handlerEditArea}
+              className='cursor-pointer'
+            >
               Editar
             </DropdownMenuItem>
             <DropdownMenuItem
@@ -111,7 +131,13 @@ export const columns: ColumnDef<AreaType>[] = [
   }
 ]
 
-export function ListingAreas() {
+export function ListingAreas({
+  fcData,
+  toggleDialogUpdate
+}: {
+  fcData: (value: null | dataType) => void
+  toggleDialogUpdate: () => void
+}) {
   const { data: areas } = useGetAreas()
   const [sorting, setSorting] = React.useState<SortingState>([])
   const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
@@ -123,7 +149,10 @@ export function ListingAreas() {
 
   const table = useReactTable({
     data: areas ?? [],
-    columns,
+    columns: columns({
+      fcData,
+      toggleDialogUpdate
+    }),
     onSortingChange: setSorting,
     onColumnFiltersChange: setColumnFilters,
     getCoreRowModel: getCoreRowModel(),

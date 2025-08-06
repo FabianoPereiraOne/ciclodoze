@@ -1,5 +1,9 @@
 import { Button } from "@/components/ui/button"
-import { DialogContent } from "@/components/ui/dialog"
+import {
+  DialogContent,
+  DialogHeader,
+  DialogTitle
+} from "@/components/ui/dialog"
 import {
   Form,
   FormControl,
@@ -56,6 +60,9 @@ export const DialogAdd = ({ toggleDialog }: { toggleDialog: () => void }) => {
 
   return (
     <DialogContent className='bg-primary-foreground'>
+      <DialogHeader>
+        <DialogTitle>Criar Área</DialogTitle>
+      </DialogHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-8 mt-4'>
           <FormField
