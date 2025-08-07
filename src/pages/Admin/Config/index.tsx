@@ -9,10 +9,10 @@ export const Config = () => {
 
   return (
     <LayoutDash>
-      <div className='flex w-full'>
-        <div className='w-64 border-r bg-muted/10 p-4'>
+      <div className='flex flex-col sm:flex-row w-full'>
+        <div className=' w-full sm:w-64 border-b sm:border-r bg-muted/10 p-4'>
           <div className='mb-6'>
-            <h1 className='text-2xl font-bold'>Configurações</h1>
+            <h1 className='text-lg sm:text-2xl font-bold'>Configurações</h1>
           </div>
           <Tabs
             value={activeTab}
