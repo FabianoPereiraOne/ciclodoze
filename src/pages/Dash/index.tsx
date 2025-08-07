@@ -19,7 +19,7 @@ export const Dash = () => {
 
   return (
     <LayoutDash>
-      <PopupWelcome onClose={onCloseWelcome} open={open} />
+      <PopupWelcome onClose={onCloseWelcome} open={open} areas={areas} />
       hello world{firstLogin}
     </LayoutDash>
   )

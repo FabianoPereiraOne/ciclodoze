@@ -1,3 +1,4 @@
+import { ButtonAction } from "@/components/Button"
 import {
   Dialog,
   DialogContent,
@@ -14,16 +15,24 @@ import {
   FormLabel
 } from "@/components/ui/form"
 import { Switch } from "@/components/ui/switch"
+import { useAuth } from "@/context/AuthContext"
+import { Role } from "@/schemas/validations/settings"
+import type { AreaType } from "@/types/areas"
+import { Save } from "lucide-react"
 import { useForm } from "react-hook-form"
 
 export const PopupWelcome = ({
   open,
-  onClose
+  onClose,
+  areas
 }: {
   open: boolean
+  areas: AreaType[]
   onClose: () => void
 }) => {
   const form = useForm()
+  const { user } = useAuth()
+  const isAdmin = user?.type === Role.ADMIN
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -42,31 +51,52 @@ export const PopupWelcome = ({
           <p className='text-center text-md md:text-lg  font-medium'>
             Escolha suas áreas de interesse:
           </p>
-          <div className='grid grid-cols-4 gap-4'>
-            <Form {...form}>
-              <form onSubmit={form.handleSubmit(() => {})}>
-                <FormField
-                  control={form.control}
-                  name='marketing_emails'
-                  render={({ field }) => (
-                    <FormItem className='flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm'>
-                      <div className='space-y-0.5'>
-                        <FormLabel>Marketing emails</FormLabel>
-                        <FormDescription>
-                          Receive emails about new products, features, and more.
-                        </FormDescription>
-                      </div>
-                      <FormControl>
-                        <Switch
-                          checked={field.value}
-                          onCheckedChange={field.onChange}
-                        />
-                      </FormControl>
-                    </FormItem>
-                  )}
-                />
-              </form>
-            </Form>
+          <div className='grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4'>
+            {areas?.map((area, index) => {
+              const id = area?.id ?? index?.toString()
+              const access = area?.access
+              const isActive = area?.isActive
+              const name = area?.name ?? ""
+
+              return (
+                <Form {...form} key={id}>
+                  <form onSubmit={form.handleSubmit(() => {})}>
+                    <FormField
+                      control={form.control}
+                      name={`${id}`}
+                      render={({ field }) => (
+                        <FormItem className='flex flex-row items-center justify-between rounded-lg border p-3 shadow-sm'>
+                          <div className='space-y-0.5'>
+                            <FormLabel
+                              className={!isActive ? "text-zinc-500" : ""}
+                            >
+                              {name}
+                            </FormLabel>
+                            {isAdmin && (
+                              <FormDescription>{access}</FormDescription>
+                            )}
+                          </div>
+                          <FormControl>
+                            <Switch
+                              className='data-[state=checked]:bg-blue-500'
+                              disabled={!isActive}
+                              checked={field.value}
+                              onCheckedChange={field.onChange}
+                            />
+                          </FormControl>
+                        </FormItem>
+                      )}
+                    />
+                  </form>
+                </Form>
+              )
+            })}
+          </div>
+          <div className='w-full flex items-center justify-end mt-2'>
+            <ButtonAction>
+              <Save />
+              Salvar
+            </ButtonAction>
           </div>
         </div>
       </DialogContent>
