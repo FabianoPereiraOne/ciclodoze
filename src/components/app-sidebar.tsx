@@ -9,7 +9,8 @@ import {
   SidebarRail
 } from "@/components/ui/sidebar"
 import useVerifyAdmin from "@/hooks/useVerifyAdmin"
-import { pagesAdminSidebar, pagesSidebar } from "@/schemas/base/sidebar"
+import { pagesAdminSidebar } from "@/schemas/base/sidebar"
+import { NavAdmin } from "./nav-admin"
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const { isAdmin } = useVerifyAdmin()
@@ -20,8 +21,8 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         <NavUser />
       </SidebarHeader>
       <SidebarContent>
-        <NavMain items={pagesSidebar} group='Workspace' />
-        {isAdmin && <NavMain items={pagesAdminSidebar} group='Gerenciar' />}
+        <NavMain group='Workspace' />
+        {isAdmin && <NavAdmin items={pagesAdminSidebar} group='Gerenciar' />}
       </SidebarContent>
       <SidebarRail />
     </Sidebar>

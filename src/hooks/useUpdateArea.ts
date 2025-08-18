@@ -8,8 +8,11 @@ export type AreaResponseType = {
 type UpdateAreaSchemaType = {
   id: number
   isActive?: boolean
-  name?: string
+  title?: string
   access?: string
+  icon?: string
+  pages: { title: string; url: string }[]
+  url?: string
 }
 
 export const useUpdateArea = () => {
@@ -17,10 +20,13 @@ export const useUpdateArea = () => {
 
   return useMutation({
     mutationFn: async ({
-      name,
+      title,
       access,
       id,
-      isActive
+      isActive,
+      icon,
+      pages,
+      url
     }: UpdateAreaSchemaType) => {
       const result = await fetch(`${envSchema.API_URL}/areas/${id}`, {
         method: "PATCH",
@@ -28,7 +34,15 @@ export const useUpdateArea = () => {
         headers: {
           "Content-type": "application/json"
         },
-        body: JSON.stringify({ name, access, isActive })
+        body: JSON.stringify({
+          title,
+          access,
+          id,
+          isActive,
+          icon,
+          pages,
+          url
+        })
       })
 
       if (!result.ok) {

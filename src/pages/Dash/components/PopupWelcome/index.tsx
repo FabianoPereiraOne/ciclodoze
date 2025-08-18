@@ -16,23 +16,38 @@ import {
 } from "@/components/ui/form"
 import { Switch } from "@/components/ui/switch"
 import { useAuth } from "@/context/AuthContext"
+import { useCreateUserArea } from "@/hooks/useCreateUserArea"
+import { availableIcons } from "@/schemas/base/icons"
 import { Role } from "@/schemas/validations/settings"
-import type { AreaType } from "@/types/areas"
-import { Save } from "lucide-react"
+import { Info, Save } from "lucide-react"
 import { useForm } from "react-hook-form"
+import { toast } from "sonner"
 
 export const PopupWelcome = ({
   open,
-  onClose,
-  areas
+  onClose
 }: {
   open: boolean
-  areas: AreaType[]
   onClose: () => void
 }) => {
-  const form = useForm()
-  const { user } = useAuth()
+  const form = useForm<Record<string, boolean>>()
+  const { user, areas } = useAuth()
+  const { mutateAsync } = useCreateUserArea()
   const isAdmin = user?.type === Role.ADMIN
+
+  const onSubmit = async (data: Record<string, boolean | undefined>) => {
+    const listAreas = Object.keys(data ?? {}).filter(key => data[key])
+    const areasFormatted = listAreas?.map(area => parseInt(area))
+
+    try {
+      const response = await mutateAsync({ areas: areasFormatted })
+      const message = response?.message
+      toast.success(message)
+      onClose()
+    } catch (error: any) {
+      toast.error(error?.message)
+    }
+  }
 
   return (
     <Dialog open={open} onOpenChange={onClose}>
@@ -51,17 +66,22 @@ export const PopupWelcome = ({
           <p className='text-center text-md md:text-lg  font-medium'>
             Escolha suas áreas de interesse:
           </p>
-          <div className='grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4'>
-            {areas?.map((area, index) => {
-              const id = area?.id ?? index?.toString()
-              const access = area?.access
-              const isActive = area?.isActive
-              const name = area?.name ?? ""
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)}>
+              <div className='grid grid-cols-[repeat(auto-fill,minmax(240px,1fr))] gap-4'>
+                {areas?.all?.map((area, index) => {
+                  const id = area?.id ?? index?.toString()
+                  const access = area?.access
+                  const isActive = area?.isActive
+                  const name = area?.title ?? ""
+                  const iconString = area?.icon ?? ""
+                  const IconComponent =
+                    availableIcons.find(icon => icon?.value === iconString)
+                      ?.icon ?? Info
 
-              return (
-                <Form {...form} key={id}>
-                  <form onSubmit={form.handleSubmit(() => {})}>
+                  return (
                     <FormField
+                      key={id}
                       control={form.control}
                       name={`${id}`}
                       render={({ field }) => (
@@ -70,7 +90,7 @@ export const PopupWelcome = ({
                             <FormLabel
                               className={!isActive ? "text-zinc-500" : ""}
                             >
-                              {name}
+                              <IconComponent /> {name}
                             </FormLabel>
                             {isAdmin && (
                               <FormDescription>{access}</FormDescription>
@@ -87,17 +107,17 @@ export const PopupWelcome = ({
                         </FormItem>
                       )}
                     />
-                  </form>
-                </Form>
-              )
-            })}
-          </div>
-          <div className='w-full flex items-center justify-end mt-2'>
-            <ButtonAction>
-              <Save />
-              Salvar
-            </ButtonAction>
-          </div>
+                  )
+                })}
+              </div>
+              <div className='w-full flex items-center justify-end mt-[36px]'>
+                <ButtonAction type='submit'>
+                  <Save />
+                  Salvar
+                </ButtonAction>
+              </div>
+            </form>
+          </Form>
         </div>
       </DialogContent>
     </Dialog>

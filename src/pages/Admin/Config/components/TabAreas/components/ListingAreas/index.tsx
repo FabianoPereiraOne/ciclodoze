@@ -5,17 +5,6 @@ import type {
   VisibilityState
 } from "@tanstack/react-table"
 
-import {
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  getSortedRowModel,
-  useReactTable
-} from "@tanstack/react-table"
-import { ChevronDown, MoreHorizontal } from "lucide-react"
-import * as React from "react"
-
 import { Button } from "@/components/ui/button"
 import {
   DropdownMenu,
@@ -37,7 +26,18 @@ import {
 } from "@/components/ui/table"
 import { useDeleteArea } from "@/hooks/useDeleteArea"
 import { useGetAreas } from "@/hooks/useGetAreas"
+import { availableIcons } from "@/schemas/base/icons"
 import type { AreaType, dataType } from "@/types/areas"
+import {
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  useReactTable
+} from "@tanstack/react-table"
+import { ChevronDown, Info, MoreHorizontal } from "lucide-react"
+import * as React from "react"
 import { toast } from "sonner"
 
 export const columns = ({
@@ -62,9 +62,21 @@ export const columns = ({
     )
   },
   {
-    accessorKey: "name",
-    header: "Nome",
-    cell: ({ row }) => <div>{row.getValue("name")}</div>
+    accessorKey: "title",
+    header: "Titulo",
+    enableHiding: false,
+    cell: ({ row }) => {
+      const IconString =
+        availableIcons.find(icon => icon?.value === row.original.icon)?.icon ??
+        Info
+
+      return (
+        <div className='flex gap-2 items-center'>
+          <IconString />
+          {row.getValue("title")}
+        </div>
+      )
+    }
   },
   {
     accessorKey: "access",
@@ -72,6 +84,19 @@ export const columns = ({
     cell: ({ row }) => (
       <div className='capitalize'>{row.getValue("access")}</div>
     )
+  },
+  {
+    accessorKey: "pages",
+    header: "Páginas",
+    cell: ({ row }) => {
+      const pages: { title: string; url: string }[] = Array.isArray(
+        row.getValue("pages")
+      )
+        ? row.getValue("pages")
+        : []
+
+      return <div>{pages?.length}</div>
+    }
   },
   {
     id: "actions",
@@ -92,10 +117,7 @@ export const columns = ({
 
       const handlerEditArea = () => {
         fcData({
-          id: row?.getValue("id"),
-          isActive: row?.getValue("isActive"),
-          name: row?.getValue("name"),
-          access: row?.getValue("access")
+          ...row?.original
         })
 
         toggleDialogUpdate()
@@ -174,9 +196,9 @@ export function ListingAreas({
       <div className='flex items-center py-4'>
         <Input
           placeholder='Pesquisa aqui...'
-          value={(table.getColumn("name")?.getFilterValue() as string) ?? ""}
+          value={(table.getColumn("title")?.getFilterValue() as string) ?? ""}
           onChange={event =>
-            table.getColumn("name")?.setFilterValue(event.target.value)
+            table.getColumn("title")?.setFilterValue(event.target.value)
           }
           className='max-w-sm'
         />
@@ -243,14 +265,7 @@ export function ListingAreas({
                 </TableRow>
               ))
             ) : (
-              <TableRow>
-                <TableCell
-                  colSpan={columns.length}
-                  className='h-24 text-center'
-                >
-                  Nenhuma area encontrada.
-                </TableCell>
-              </TableRow>
+              <></>
             )}
           </TableBody>
         </Table>

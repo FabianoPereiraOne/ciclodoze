@@ -1,16 +1,29 @@
 import { LayoutDash } from "@/components/LayoutDash"
-import { useGetDashboard } from "@/hooks/useGetDashboard"
+import { useAuth } from "@/context/AuthContext"
+import { useUpdateUser } from "@/hooks/useUpdateUser"
 import { useEffect, useState } from "react"
 import { PopupWelcome } from "./components/PopupWelcome"
 
 export const Dash = () => {
   const [open, setOpen] = useState(false)
-  const { data } = useGetDashboard()
-  const areas = data?.areas ?? []
-  const firstLogin = data?.firstLogin
+  const { firstLogin, changeFirstLogin } = useAuth()
+  const { mutateAsync } = useUpdateUser()
+
+  const loadUpdateUser = async () => {
+    try {
+      await mutateAsync({ firstLogin: false })
+      changeFirstLogin(false)
+    } catch (error) {
+      console.error(error)
+    }
+  }
 
   useEffect(() => {
-    setOpen(!!firstLogin)
+    setOpen(firstLogin)
+
+    if (!firstLogin) {
+      loadUpdateUser()
+    }
   }, [firstLogin])
 
   const onCloseWelcome = () => {
@@ -19,8 +32,8 @@ export const Dash = () => {
 
   return (
     <LayoutDash>
-      <PopupWelcome onClose={onCloseWelcome} open={open} areas={areas} />
-      hello world{firstLogin}
+      <PopupWelcome onClose={onCloseWelcome} open={open} />
+      hello world
     </LayoutDash>
   )
 }

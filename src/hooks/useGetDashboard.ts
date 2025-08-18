@@ -6,6 +6,7 @@ type DashboardResponseType = {
   message: string
   firstLogin: boolean
   areas: AreaType[]
+  allowedAreas: AreaType[]
 }
 
 export const useGetDashboard = () => {

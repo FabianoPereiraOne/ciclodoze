@@ -10,7 +10,8 @@ import {
   FormControl,
   FormField,
   FormItem,
-  FormLabel
+  FormLabel,
+  FormMessage
 } from "@/components/ui/form"
 import { Input } from "@/components/ui/input"
 import {
@@ -20,9 +21,9 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
-import { Switch } from "@/components/ui/switch"
 import { useUpdateArea } from "@/hooks/useUpdateArea"
 import { cn } from "@/lib/utils"
+import { availableIcons } from "@/schemas/base/icons"
 import {
   updateAreaSchema,
   type UpdateAreaSchemaType
@@ -30,9 +31,9 @@ import {
 import { FullAccess } from "@/schemas/validations/settings"
 import type { dataType } from "@/types/areas"
 import { zodResolver } from "@hookform/resolvers/zod"
-import { Loader2, LucideEdit2 } from "lucide-react"
+import { Loader2, LucideEdit, Plus, Trash2 } from "lucide-react"
 import { useEffect } from "react"
-import { useForm } from "react-hook-form"
+import { useFieldArray, useForm } from "react-hook-form"
 import { toast } from "sonner"
 
 export const DialogUpdate = ({
@@ -50,27 +51,49 @@ export const DialogUpdate = ({
   const form = useForm<UpdateAreaSchemaType>({
     resolver: zodResolver(updateAreaSchema),
     defaultValues: data ?? {
-      id: 0,
-      isActive: true,
-      name: "",
-      access: ""
+      title: "",
+      access: "",
+      icon: "",
+      url: "",
+      pages: []
     }
   })
 
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: "pages"
+  })
+
+  const addPage = () => {
+    append({ title: "", url: "" })
+  }
+
   const onSubmit = async ({
-    name,
+    title,
     access,
     id,
-    isActive
+    isActive,
+    icon,
+    pages,
+    url
   }: UpdateAreaSchemaType) => {
     try {
-      const response = await mutateAsync({ name, access, id, isActive })
+      const response = await mutateAsync({
+        title,
+        access,
+        id,
+        isActive,
+        icon,
+        pages: pages ?? [],
+        url
+      })
       const message = response?.message
       form.reset({
-        id: 0,
-        isActive: true,
-        name: "",
-        access: ""
+        title: "",
+        access: "",
+        icon: "",
+        url: "",
+        pages: []
       })
       toast.success(message)
     } catch (error: any) {
@@ -95,17 +118,70 @@ export const DialogUpdate = ({
         <Form {...form}>
           <form
             onSubmit={form.handleSubmit(onSubmit)}
-            className='space-y-8 mt-4'
+            className='space-y-6 mt-4'
           >
             <FormField
               control={form.control}
-              name='name'
+              name='title'
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Nome da Área</FormLabel>
+                  <FormLabel>Titulo da Área *</FormLabel>
                   <FormControl>
                     <Input type='text' placeholder='Estudos' {...field} />
                   </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='icon'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>Ícone da Área *</FormLabel>
+                  <FormControl>
+                    <Select value={field.value} onValueChange={field.onChange}>
+                      <SelectTrigger className='w-full'>
+                        <SelectValue placeholder='Selecione um ícone' />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableIcons.map(iconItem => {
+                          const IconComponent = iconItem?.icon
+                          return (
+                            <SelectItem
+                              key={iconItem?.value}
+                              value={iconItem?.value}
+                            >
+                              <div className='flex items-center gap-2'>
+                                <IconComponent className='w-4 h-4' />
+                                {iconItem?.label}
+                              </div>
+                            </SelectItem>
+                          )
+                        })}
+                      </SelectContent>
+                    </Select>
+                  </FormControl>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
+
+            <FormField
+              control={form.control}
+              name='url'
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>URL da Área (opcional)</FormLabel>
+                  <FormControl>
+                    <Input
+                      type='url'
+                      placeholder='https://exemplo.com/area'
+                      {...field}
+                    />
+                  </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
@@ -132,26 +208,80 @@ export const DialogUpdate = ({
                       </SelectContent>
                     </Select>
                   </FormControl>
+                  <FormMessage />
                 </FormItem>
               )}
             />
 
-            <FormField
-              control={form.control}
-              name='isActive'
-              render={({ field }) => (
-                <FormItem className='flex gap-2 items-center'>
-                  <FormControl>
-                    <Switch
-                      id='isActive'
-                      checked={field.value}
-                      onCheckedChange={field.onChange}
-                    />
-                  </FormControl>
-                  <FormLabel htmlFor='isActive'>Status</FormLabel>
-                </FormItem>
+            <div className='space-y-4'>
+              <div className='flex items-center justify-between'>
+                <FormLabel>Páginas da Área</FormLabel>
+                <Button
+                  type='button'
+                  variant='outline'
+                  size='sm'
+                  onClick={addPage}
+                  className='flex items-center gap-1 bg-transparent'
+                >
+                  <Plus className='w-4 h-4' />
+                  Adicionar Página
+                </Button>
+              </div>
+
+              {fields.length === 0 && (
+                <p className='text-sm text-muted-foreground'>
+                  Nenhuma página adicionada.
+                </p>
               )}
-            />
+
+              {fields.map((field, index) => (
+                <div key={field.id} className='flex gap-2 items-end'>
+                  <div className='flex-1 space-y-2'>
+                    <FormField
+                      control={form.control}
+                      name={`pages.${index}.title`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className='text-sm'>
+                            Título da Página
+                          </FormLabel>
+                          <FormControl>
+                            <Input placeholder='Ex: Dashboard' {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <div className='flex-1 space-y-2'>
+                    <FormField
+                      control={form.control}
+                      name={`pages.${index}.url`}
+                      render={({ field }) => (
+                        <FormItem>
+                          <FormLabel className='text-sm'>
+                            URL da Página
+                          </FormLabel>
+                          <FormControl>
+                            <Input placeholder='Ex: /dashboard' {...field} />
+                          </FormControl>
+                          <FormMessage />
+                        </FormItem>
+                      )}
+                    />
+                  </div>
+                  <Button
+                    type='button'
+                    variant='outline'
+                    size='sm'
+                    onClick={() => remove(index)}
+                    className='text-red-600 hover:text-red-700'
+                  >
+                    <Trash2 className='w-4 h-4' />
+                  </Button>
+                </div>
+              ))}
+            </div>
 
             <div className='flex justify-end'>
               <Button
@@ -160,12 +290,12 @@ export const DialogUpdate = ({
               >
                 {isPending ? (
                   <>
-                    <Loader2 className={cn("animate-spin", "w-10 h-10")} />
-                    Atualizando área
+                    <Loader2 className={cn("animate-spin", "w-4 h-4")} />
+                    Atualizando
                   </>
                 ) : (
                   <>
-                    <LucideEdit2 />
+                    <LucideEdit />
                     Atualizar área
                   </>
                 )}
