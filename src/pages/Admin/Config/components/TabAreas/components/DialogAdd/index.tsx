@@ -144,11 +144,7 @@ export const DialogAdd = ({ toggleDialog }: { toggleDialog: () => void }) => {
               <FormItem>
                 <FormLabel>URL da Área (opcional)</FormLabel>
                 <FormControl>
-                  <Input
-                    type='url'
-                    placeholder='https://exemplo.com/area'
-                    {...field}
-                  />
+                  <Input placeholder='https://exemplo.com/area' {...field} />
                 </FormControl>
                 <FormMessage />
               </FormItem>

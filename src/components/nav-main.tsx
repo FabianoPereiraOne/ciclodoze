@@ -32,9 +32,10 @@ export function NavMain({ group }: { group?: string }) {
       {hasGroup && <SidebarGroupLabel>{group}</SidebarGroupLabel>}
       <SidebarMenu>
         {listAreas?.map((item, index) => {
-          const hasItems = !!item?.pages
+          const pages = item?.pages ?? []
+          const hasPages = pages && pages?.length > 0
 
-          if (!hasItems) {
+          if (!hasPages) {
             return (
               <SidebarMenuItem key={index?.toString()}>
                 <SidebarMenuButton asChild tooltip={item?.title}>
