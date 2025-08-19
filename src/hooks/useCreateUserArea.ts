@@ -1,11 +1,13 @@
 import { envSchema } from "@/env"
-import { useMutation } from "@tanstack/react-query"
+import { useMutation, useQueryClient } from "@tanstack/react-query"
 
 export type AreaResponseType = {
   message: string
 }
 
 export const useCreateUserArea = () => {
+  const queryClient = useQueryClient()
+
   return useMutation({
     mutationFn: async ({ areas }: { areas: number[] }) => {
       const result = await fetch(`${envSchema.API_URL}/user-areas`, {
@@ -25,6 +27,9 @@ export const useCreateUserArea = () => {
       const response: AreaResponseType = await result.json()
 
       return response
+    },
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] })
     }
   })
 }

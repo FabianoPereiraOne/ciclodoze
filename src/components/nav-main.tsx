@@ -1,6 +1,6 @@
 "use client"
 
-import { ChevronRight } from "lucide-react"
+import { ChevronRight, Info } from "lucide-react"
 
 import {
   Collapsible,
@@ -19,6 +19,7 @@ import {
 } from "@/components/ui/sidebar"
 import { useAuth } from "@/context/AuthContext"
 import useVerifyAdmin from "@/hooks/useVerifyAdmin"
+import { availableIcons } from "@/schemas/base/icons"
 import { Link } from "react-router-dom"
 
 export function NavMain({ group }: { group?: string }) {
@@ -34,13 +35,16 @@ export function NavMain({ group }: { group?: string }) {
         {listAreas?.map((item, index) => {
           const pages = item?.pages ?? []
           const hasPages = pages && pages?.length > 0
+          const IconString =
+            availableIcons.find(icon => icon?.value === item?.icon)?.icon ??
+            Info
 
           if (!hasPages) {
             return (
               <SidebarMenuItem key={index?.toString()}>
                 <SidebarMenuButton asChild tooltip={item?.title}>
                   <Link to={item?.url}>
-                    {item?.icon && <item.icon />}
+                    {item?.icon && <IconString />}
                     <span>{item?.title}</span>
                   </Link>
                 </SidebarMenuButton>
@@ -58,7 +62,7 @@ export function NavMain({ group }: { group?: string }) {
               <SidebarMenuItem>
                 <CollapsibleTrigger asChild>
                   <SidebarMenuButton tooltip={item.title}>
-                    {item?.icon && <item.icon />}
+                    {item?.icon && <IconString />}
                     <span>{item?.title}</span>
                     <ChevronRight className='ml-auto transition-transform duration-200 group-data-[state=open]/collapsible:rotate-90' />
                   </SidebarMenuButton>
