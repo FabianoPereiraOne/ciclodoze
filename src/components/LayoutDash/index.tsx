@@ -5,13 +5,24 @@ import {
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
-  BreadcrumbPage,
   BreadcrumbSeparator
 } from "../ui/breadcrumb"
 import { Separator } from "../ui/separator"
 import { SidebarProvider, SidebarTrigger } from "../ui/sidebar"
 
 export const LayoutDash = ({ children }: { children: ReactNode }) => {
+  const pathname = window.location.pathname
+  const breadcrumbs = pathname
+    ?.split("/")
+    .filter(path => path?.trim()?.length > 0)
+  const breadcrumbLinks = breadcrumbs.map((crumb, index) => {
+    const url = "/" + breadcrumbs.slice(0, index + 1).join("/")
+    return {
+      label: crumb,
+      url
+    }
+  })
+
   return (
     <SidebarProvider>
       <AppSidebar />
@@ -24,13 +35,27 @@ export const LayoutDash = ({ children }: { children: ReactNode }) => {
           />
           <Breadcrumb>
             <BreadcrumbList>
-              <BreadcrumbItem className='hidden md:block'>
-                <BreadcrumbLink href='/'>Dashboard</BreadcrumbLink>
-              </BreadcrumbItem>
-              <BreadcrumbSeparator className='hidden md:block' />
-              <BreadcrumbItem>
-                <BreadcrumbPage>Inbox</BreadcrumbPage>
-              </BreadcrumbItem>
+              {breadcrumbLinks?.map((bread, index) => {
+                const label = bread?.label
+                const url = bread?.url
+                const isLast = index === breadcrumbLinks?.length - 1
+
+                return (
+                  <>
+                    <BreadcrumbItem
+                      key={index?.toString()}
+                      className='hidden md:block'
+                    >
+                      <BreadcrumbLink href={url} className='capitalize'>
+                        {label}
+                      </BreadcrumbLink>
+                    </BreadcrumbItem>
+                    {!isLast && (
+                      <BreadcrumbSeparator className='hidden md:block' />
+                    )}
+                  </>
+                )
+              })}
             </BreadcrumbList>
           </Breadcrumb>
         </header>

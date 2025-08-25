@@ -55,7 +55,7 @@ export const Login = () => {
 
       toast.success(message)
       setTimeout(() => {
-        window.location.href = "/dash"
+        window.location.href = "/dashboard"
       }, 1000)
     } catch (error: any) {
       toast.error(error?.message)

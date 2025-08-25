@@ -14,7 +14,7 @@ export default function Middleware({ element, roles }: MiddlewareProps) {
   const location = useLocation()
   const publicPaths = ["/", "/esqueceu-senha", "/criar-conta", "/ativar-conta"]
   const pathname = location.pathname
-  const isDashboard = pathname.includes("dash")
+  const isDashboard = pathname.includes("dashboard")
   const { data } = isDashboard ? useGetDashboard() : { data: null }
   const areas = data?.areas ?? []
   const allowedAreas = data?.allowedAreas ?? []
@@ -63,13 +63,13 @@ export default function Middleware({ element, roles }: MiddlewareProps) {
     }
 
     if (publicPaths.includes(pathname)) {
-      window.location.replace("/dash")
+      window.location.replace("/dashboard")
       setLoading(false)
       return
     }
 
     if (!isAuthorized) {
-      window.location.replace("/dash")
+      window.location.replace("/dashboard")
       setLoading(false)
       return
     }

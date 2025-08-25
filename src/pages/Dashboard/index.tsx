@@ -4,7 +4,7 @@ import { useUpdateUser } from "@/hooks/useUpdateUser"
 import { useEffect, useState } from "react"
 import { PopupWelcome } from "./components/PopupWelcome"
 
-export const Dash = () => {
+export const Dashboard = () => {
   const [open, setOpen] = useState(false)
   const { firstLogin, changeFirstLogin } = useAuth()
   const { mutateAsync } = useUpdateUser()

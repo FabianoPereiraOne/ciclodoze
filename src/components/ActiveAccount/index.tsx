@@ -41,7 +41,7 @@ export const ActiveAccount = ({ onCallback }: { onCallback?: () => void }) => {
 
       toast.success(message)
       setTimeout(() => {
-        window.location.href = "/dash"
+        window.location.href = "/dashboard"
       }, 1000)
     } catch (error: any) {
       setError(true)
