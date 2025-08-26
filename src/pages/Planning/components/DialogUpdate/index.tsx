@@ -21,23 +21,34 @@ import {
   SelectValue
 } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { useCreateGoal } from "@/hooks/useCreateGoal"
+import { useUpdateGoal } from "@/hooks/useUpdateGoal"
 import { cn } from "@/lib/utils"
 import { availableIcons } from "@/schemas/base/icons"
-import { GoalSchema, type GoalSchemaType } from "@/schemas/validations/goals"
+import {
+  GoalUpdateSchema,
+  type GoalUpdateSchemaType
+} from "@/schemas/validations/goals"
 import { Categories, Difficulties } from "@/schemas/validations/settings"
+import type { GoalType } from "@/types/goals"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Loader2 } from "lucide-react"
+import { useEffect } from "react"
 
 import { useForm } from "react-hook-form"
 import { LuPlus } from "react-icons/lu"
 import { toast } from "sonner"
 
-export const DialogAdd = ({ toggleDialog }: { toggleDialog: () => void }) => {
-  const { mutateAsync, isPending } = useCreateGoal()
-  const form = useForm<GoalSchemaType>({
-    resolver: zodResolver(GoalSchema),
-    defaultValues: {
+export const DialogUpdate = ({
+  toggleDialog,
+  data
+}: {
+  data: GoalType | null
+  toggleDialog: () => void
+}) => {
+  const { mutateAsync, isPending } = useUpdateGoal()
+  const form = useForm<GoalUpdateSchemaType>({
+    resolver: zodResolver(GoalUpdateSchema),
+    defaultValues: data ?? {
       category: "",
       difficulty: "NORMAL",
       icon: "",
@@ -51,15 +62,21 @@ export const DialogAdd = ({ toggleDialog }: { toggleDialog: () => void }) => {
     difficulty,
     icon,
     name,
-    why
-  }: GoalSchemaType) => {
+    why,
+    id,
+    progress,
+    status
+  }: GoalUpdateSchemaType) => {
     try {
       const response = await mutateAsync({
         category,
         difficulty,
         icon,
         name,
-        why
+        why,
+        id,
+        progress,
+        status
       })
       const message = response?.message
       form.reset({
@@ -77,10 +94,16 @@ export const DialogAdd = ({ toggleDialog }: { toggleDialog: () => void }) => {
     }
   }
 
+  useEffect(() => {
+    if (data) {
+      form.reset(data)
+    }
+  }, [data])
+
   return (
     <DialogContent className='bg-primary-foreground max-w-2xl max-h-[80vh] overflow-y-auto'>
       <DialogHeader>
-        <DialogTitle>Criar Meta</DialogTitle>
+        <DialogTitle>Atualizar Meta</DialogTitle>
       </DialogHeader>
       <Form {...form}>
         <form onSubmit={form.handleSubmit(onSubmit)} className='space-y-6 mt-4'>
@@ -220,12 +243,12 @@ export const DialogAdd = ({ toggleDialog }: { toggleDialog: () => void }) => {
               {isPending ? (
                 <>
                   <Loader2 className={cn("animate-spin", "w-4 h-4")} />
-                  Criando meta
+                  Atualizando meta
                 </>
               ) : (
                 <>
                   <LuPlus />
-                  Criar meta
+                  Atualizar meta
                 </>
               )}
             </Button>
