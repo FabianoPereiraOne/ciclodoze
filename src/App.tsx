@@ -4,7 +4,8 @@ import { Config } from "./pages/Admin/Config"
 import { Dashboard } from "./pages/Dashboard"
 import { Forgot } from "./pages/Forgot"
 import { Login } from "./pages/Login"
-import Planning from "./pages/Planning"
+import Goals from "./pages/Planning/Goals"
+import Tasks from "./pages/Planning/Tasks"
 import { Register } from "./pages/Register"
 import { FullAccess, Role } from "./schemas/validations/settings"
 
@@ -27,7 +28,12 @@ export const App = () => {
         />
         <Route
           path='/dashboard/planejamento/metas'
-          element={<Middleware element={<Planning />} roles={FullAccess} />}
+          element={<Middleware element={<Goals />} roles={FullAccess} />}
+        />
+
+        <Route
+          path='/dashboard/planejamento/tarefas'
+          element={<Middleware element={<Tasks />} roles={FullAccess} />}
         />
 
         <Route

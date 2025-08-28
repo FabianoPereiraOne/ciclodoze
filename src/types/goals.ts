@@ -1,17 +1,13 @@
+import type { DifficultyStatus, GeneralStatus } from "./general"
+
 export type GoalType = {
   id: string
   name: string
   icon?: string
   why?: string
-  difficulty: "LOW" | "NORMAL" | "HIGH"
+  difficulty: DifficultyStatus
   category: string
-  status:
-    | "IN_PROGRESS"
-    | "PENDING"
-    | "COMPLETED"
-    | "SKIPPED"
-    | "FAILED"
-    | "POSTPONED"
+  status: GeneralStatus
   progress: number
   cycleId: string
   createdAt: string

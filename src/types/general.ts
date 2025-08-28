@@ -16,3 +16,13 @@ export type TokenProps = {
 export type GeneralTypeResponse = {
   message: string
 }
+
+export type GeneralStatus =
+  | "IN_PROGRESS"
+  | "PENDING"
+  | "COMPLETED"
+  | "SKIPPED"
+  | "FAILED"
+  | "POSTPONED"
+
+export type DifficultyStatus = "LOW" | "NORMAL" | "HIGH"

@@ -1,4 +1,4 @@
-import type { ReactNode } from "react"
+import { Fragment, type ReactNode } from "react"
 import { AppSidebar } from "../app-sidebar"
 import {
   Breadcrumb,
@@ -10,7 +10,13 @@ import {
 import { Separator } from "../ui/separator"
 import { SidebarProvider, SidebarTrigger } from "../ui/sidebar"
 
-export const LayoutDash = ({ children }: { children: ReactNode }) => {
+export const LayoutDash = ({
+  children,
+  component
+}: {
+  children: ReactNode
+  component?: ReactNode
+}) => {
   const pathname = window.location.pathname
   const breadcrumbs = pathname
     ?.split("/")
@@ -41,11 +47,8 @@ export const LayoutDash = ({ children }: { children: ReactNode }) => {
                 const isLast = index === breadcrumbLinks?.length - 1
 
                 return (
-                  <>
-                    <BreadcrumbItem
-                      key={index?.toString()}
-                      className='hidden md:block'
-                    >
+                  <Fragment key={index?.toString()}>
+                    <BreadcrumbItem className='hidden md:block'>
                       <BreadcrumbLink href={url} className='capitalize'>
                         {label}
                       </BreadcrumbLink>
@@ -53,11 +56,12 @@ export const LayoutDash = ({ children }: { children: ReactNode }) => {
                     {!isLast && (
                       <BreadcrumbSeparator className='hidden md:block' />
                     )}
-                  </>
+                  </Fragment>
                 )
               })}
             </BreadcrumbList>
           </Breadcrumb>
+          {component}
         </header>
         <div className='w-full'>{children}</div>
       </main>

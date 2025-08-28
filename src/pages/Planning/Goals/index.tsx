@@ -23,7 +23,7 @@ import { DialogAdd } from "./components/DialogAdd"
 import { DialogUpdate } from "./components/DialogUpdate"
 import { Listing } from "./components/Listing"
 
-export default function Planning() {
+export default function Goals() {
   const [open, setOpen] = useState(false)
   const [start, setStart] = useState(false)
   const [update, setUpdate] = useState(false)
@@ -58,7 +58,7 @@ export default function Planning() {
         </DialogTrigger>
         <DialogAdd toggleDialog={toggleDialog} />
       </Dialog>
-      <div className='w-full px-[20px] py-[24px] flex flex-col gap-[20px'>
+      <div className='w-full px-[20px] py-[24px] flex flex-col gap-[20px]'>
         <div className='w-full flex items-center justify-between'>
           <div>
             <h2 className='text-xl font-semibold mb-2'>Minhas metas</h2>
