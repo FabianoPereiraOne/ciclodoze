@@ -5,6 +5,7 @@ import {
   ContextMenuItem,
   ContextMenuTrigger
 } from "@/components/ui/context-menu"
+import { Input } from "@/components/ui/input"
 import { useCheckTask } from "@/hooks/useCheckTask"
 import { useDeleteTask } from "@/hooks/useDeleteTask"
 import { useUpdateTask } from "@/hooks/useUpdateTask"
@@ -30,6 +31,7 @@ export const DayTask = ({
   onAddTask: (day: string, time?: string) => void
 }) => {
   const [isOpen, setIsOpen] = useState(false)
+  const [updatingTitle, setUpdatingTitle] = useState(false)
   const [task, setTask] = useState<TaskType | null>(null)
   const { mutateAsync, isPending } = useCheckTask()
   const { mutateAsync: deleteTask } = useDeleteTask()
@@ -75,6 +77,35 @@ export const DayTask = ({
       toast.success(message)
     } catch (error: any) {
       toast.error(error?.message)
+    }
+  }
+
+  const handlerEditTitleTask = (task: TaskType) => {
+    setUpdatingTitle(true)
+    setTask({
+      ...task,
+      day: task?.day?.toString()
+    })
+  }
+
+  const handlerCancelEditTitleTask = () => {
+    setUpdatingTitle(false)
+    setTask(null)
+  }
+
+  const handlerSaveTitleTask = async () => {
+    try {
+      const response = await updateTask({
+        title: task?.title,
+        id: task?.id
+      })
+      const message = response?.message
+
+      toast.success(message)
+    } catch (error: any) {
+      toast.error(error?.message)
+    } finally {
+      handlerCancelEditTitleTask()
     }
   }
 
@@ -139,20 +170,54 @@ export const DayTask = ({
                       >
                         {isCompleted && <Check />}
                       </button>
-                      <div className='flex-1 min-w-0 relative'>
-                        <p
-                          className={`text-sm max-w-[80%] ${
-                            isCompleted
-                              ? "line-through text-zinc-500"
-                              : "text-white"
-                          }`}
-                        >
-                          {title}
-                        </p>
-                        <div className='absolute right-0 top-0 flex items-center space-x-1 mt-1'>
-                          <Clock className='w-3 h-3 text-zinc-500' />
-                          <span className='text-xs text-zinc-500'>{time}</span>
-                        </div>
+                      <div className='flex-1 min-w-0 min-h-[1rem] relative'>
+                        {updatingTitle ? (
+                          <Input
+                            defaultValue={task?.title}
+                            placeholder='Titulo'
+                            onKeyDown={e => {
+                              const esc = e?.key === "Escape"
+                              const enter = e?.key === "Enter"
+
+                              if (esc) {
+                                handlerCancelEditTitleTask()
+                                return
+                              }
+
+                              if (enter) {
+                                e.preventDefault()
+                                handlerSaveTitleTask()
+                              }
+                            }}
+                            onChange={event => {
+                              const value = event.target.value
+                              setTask((prev: any) => ({
+                                ...prev,
+                                title: value
+                              }))
+                            }}
+                            className={`text-sm leading-[1] h-auto min-h-0 w-full text-white !p-0 m-0 !border-0 !bg-transparent focus-visible:ring-0 focus-visible:ring-transparent focus-visible:ring-offset-0`}
+                          />
+                        ) : (
+                          <p
+                            onClick={() => handlerEditTitleTask(task)}
+                            className={`text-sm max-w-[80%] ${
+                              isCompleted
+                                ? "line-through text-zinc-500"
+                                : "text-white"
+                            }`}
+                          >
+                            {title}
+                          </p>
+                        )}
+                        {!updatingTitle && (
+                          <div className='absolute right-0 top-0 flex items-center space-x-1'>
+                            <Clock className='w-3 h-3 text-zinc-500' />
+                            <span className='text-xs text-zinc-500'>
+                              {time}
+                            </span>
+                          </div>
+                        )}
                       </div>
                     </div>
                   </div>
