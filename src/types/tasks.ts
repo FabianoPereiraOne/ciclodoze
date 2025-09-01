@@ -1,4 +1,7 @@
-import type { CreateTaskSchemaType } from "@/schemas/validations/tasks"
+import type {
+  CreateTaskSchemaType,
+  UpdateTaskSchemaType
+} from "@/schemas/validations/tasks"
 import type { DifficultyStatus, GeneralStatus } from "./general"
 
 export type TaskType = {
@@ -21,4 +24,11 @@ export type TaskModalProps = {
   weekNumber: number
   weekId: string
   isPending: boolean
+}
+
+export type UpdateTaskModalProps = {
+  onClose: () => void
+  onSave: (data: UpdateTaskSchemaType) => void
+  isPending: boolean
+  task: TaskType | null
 }

@@ -18,59 +18,67 @@ import {
 } from "@/components/ui/select"
 import { listDays, listDifficulties } from "@/schemas/base/weeks"
 import {
-  CreateTaskSchema,
-  type CreateTaskSchemaType
+  UpdateTaskSchema,
+  type UpdateTaskSchemaType
 } from "@/schemas/validations/tasks"
-import type { TaskModalProps } from "@/types/tasks"
+import type { UpdateTaskModalProps } from "@/types/tasks"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { Save, X } from "lucide-react"
 import { useEffect } from "react"
 import { useForm } from "react-hook-form"
 
-export function TaskModal({
-  isOpen,
+export function UpdateModal({
   onClose,
   onSave,
-  initialDay,
-  initialTime,
-  weekId,
-  isPending
-}: TaskModalProps) {
-  const day = initialDay?.id ?? ""
-  const time = initialTime ?? ""
-
-  const form = useForm<CreateTaskSchemaType>({
-    resolver: zodResolver(CreateTaskSchema),
+  isPending,
+  task
+}: UpdateTaskModalProps) {
+  const form = useForm<UpdateTaskSchemaType>({
+    resolver: zodResolver(UpdateTaskSchema),
     defaultValues: {
-      day,
-      difficulty: "NORMAL",
-      time,
-      title: "",
-      weekId
+      day: task?.day,
+      difficulty: task?.difficulty ?? "NORMAL",
+      time: task?.time ?? "",
+      title: task?.title,
+      weekId: task?.weekId,
+      id: task?.id,
+      status: task?.status,
+      actionPlanId: task?.actionPlanId ?? undefined
     }
   })
 
   const handlerCancelTask = () => {
     form.reset({
-      day: "",
-      difficulty: "NORMAL",
-      time: "",
-      title: "",
-      weekId
+      day: task?.day,
+      difficulty: task?.difficulty ?? "NORMAL",
+      time: task?.time ?? "",
+      title: task?.title,
+      weekId: task?.weekId,
+      id: task?.id,
+      status: task?.status,
+      actionPlanId: task?.actionPlanId ?? undefined
     })
     onClose()
   }
 
   useEffect(() => {
-    form.setValue("day", day)
-    form.setValue("time", time)
-  }, [isOpen, initialDay, initialTime])
+    form.reset({
+      day: task?.day,
+      difficulty: task?.difficulty ?? "NORMAL",
+      time: task?.time ?? "",
+      title: task?.title,
+      weekId: task?.weekId,
+      id: task?.id,
+      status: task?.status,
+      actionPlanId: task?.actionPlanId ?? undefined
+    })
+  }, [])
 
   return (
     <div className='fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4'>
       <div className='bg-zinc-900 rounded-lg border border-zinc-800 w-full max-w-md'>
         <div className='flex items-center justify-between p-6 border-b border-zinc-800'>
-          <h2 className='text-lg font-semibold text-white'>Nova Tarefa</h2>
+          <h2 className='text-lg font-semibold text-white'>Atualizar Tarefa</h2>
           <Button
             variant='ghost'
             size='sm'

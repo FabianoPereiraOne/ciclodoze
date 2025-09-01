@@ -1,8 +1,20 @@
 import { Button } from "@/components/ui/button"
+import {
+  ContextMenu,
+  ContextMenuContent,
+  ContextMenuItem,
+  ContextMenuTrigger
+} from "@/components/ui/context-menu"
 import { useCheckTask } from "@/hooks/useCheckTask"
+import { useDeleteTask } from "@/hooks/useDeleteTask"
+import { useUpdateTask } from "@/hooks/useUpdateTask"
+import type { UpdateTaskSchemaType } from "@/schemas/validations/tasks"
 import type { GeneralStatus } from "@/types/general"
 import type { TaskType } from "@/types/tasks"
-import { Check, Clock, Plus } from "lucide-react"
+import { Check, Clock, Edit, Plus, Trash2 } from "lucide-react"
+import { useState } from "react"
+import { toast } from "sonner"
+import { UpdateModal } from "../UpdateModal"
 
 export const DayTask = ({
   isToday,
@@ -17,13 +29,52 @@ export const DayTask = ({
   dayTasks: TaskType[]
   onAddTask: (day: string, time?: string) => void
 }) => {
+  const [isOpen, setIsOpen] = useState(false)
+  const [task, setTask] = useState<TaskType | null>(null)
   const { mutateAsync, isPending } = useCheckTask()
+  const { mutateAsync: deleteTask } = useDeleteTask()
+  const { mutateAsync: updateTask, isPending: isUpdating } = useUpdateTask()
 
   const handlerCheckTask = async (id: string, status: GeneralStatus) => {
     try {
       await mutateAsync({ id, status })
     } catch (error: any) {
       console.error(error)
+    }
+  }
+
+  const handlerCancelUpdateTask = () => {
+    setIsOpen(false)
+    setTask(null)
+  }
+
+  const handlerEditTask = (task: TaskType) => {
+    setIsOpen(true)
+    setTask({
+      ...task,
+      day: task?.day?.toString()
+    })
+  }
+
+  const handlerSaveTask = async (data: UpdateTaskSchemaType) => {
+    try {
+      const response = await updateTask(data)
+      const message = response?.message
+      toast.success(message)
+    } catch (error: any) {
+      toast.error(error?.message)
+    } finally {
+      handlerCancelUpdateTask()
+    }
+  }
+
+  const handlerDeleteTask = async (taskId: string) => {
+    try {
+      const response = await deleteTask({ id: taskId })
+      const message = response?.message
+      toast.success(message)
+    } catch (error: any) {
+      toast.error(error?.message)
     }
   }
 
@@ -73,43 +124,61 @@ export const DayTask = ({
             const isCompleted = status === "COMPLETED"
 
             return (
-              <div
-                key={id}
-                className='bg-zinc-800 hover:bg-gray-750 p-2 rounded border transition-all'
-              >
-                <div className='flex items-start space-x-2'>
-                  <button
-                    disabled={isPending}
-                    onClick={() => handlerCheckTask(id, status)}
-                    className={`mt-0.5 w-4 h-4 rounded border-2 flex items-center justify-center ${
-                      isCompleted
-                        ? "bg-green-600 border-green-600"
-                        : "border-zinc-600 hover:border-zinc-500"
-                    }`}
-                  >
-                    {isCompleted && <Check />}
-                  </button>
-                  <div className='flex-1 min-w-0 relative'>
-                    <p
-                      className={`text-sm max-w-[80%] ${
-                        isCompleted
-                          ? "line-through text-zinc-500"
-                          : "text-white"
-                      }`}
-                    >
-                      {title}
-                    </p>
-                    <div className='absolute right-0 top-0 flex items-center space-x-1 mt-1'>
-                      <Clock className='w-3 h-3 text-zinc-500' />
-                      <span className='text-xs text-zinc-500'>{time}</span>
+              <ContextMenu key={id}>
+                <ContextMenuTrigger asChild>
+                  <div className='bg-zinc-800 hover:bg-gray-750 p-2 rounded border transition-all cursor-context-menu'>
+                    <div className='flex items-center space-x-2'>
+                      <button
+                        disabled={isPending}
+                        onClick={() => handlerCheckTask(id, status)}
+                        className={`mt-0.5 w-4 h-4 rounded border-2 flex items-center justify-center ${
+                          isCompleted
+                            ? "bg-green-600 border-green-600"
+                            : "border-zinc-600 hover:border-zinc-500"
+                        }`}
+                      >
+                        {isCompleted && <Check />}
+                      </button>
+                      <div className='flex-1 min-w-0 relative'>
+                        <p
+                          className={`text-sm max-w-[80%] ${
+                            isCompleted
+                              ? "line-through text-zinc-500"
+                              : "text-white"
+                          }`}
+                        >
+                          {title}
+                        </p>
+                        <div className='absolute right-0 top-0 flex items-center space-x-1 mt-1'>
+                          <Clock className='w-3 h-3 text-zinc-500' />
+                          <span className='text-xs text-zinc-500'>{time}</span>
+                        </div>
+                      </div>
                     </div>
                   </div>
-                </div>
-              </div>
+                </ContextMenuTrigger>
+
+                <ContextMenuContent>
+                  <ContextMenuItem onClick={() => handlerEditTask(task)}>
+                    <Edit className='w-4 h-4 mr-2' /> Editar
+                  </ContextMenuItem>
+                  <ContextMenuItem onClick={() => handlerDeleteTask(id)}>
+                    <Trash2 className='w-4 h-4 mr-2' /> Deletar
+                  </ContextMenuItem>
+                </ContextMenuContent>
+              </ContextMenu>
             )
           })
         )}
       </div>
+      {isOpen && (
+        <UpdateModal
+          isPending={isUpdating}
+          onClose={handlerCancelUpdateTask}
+          onSave={handlerSaveTask}
+          task={task}
+        />
+      )}
     </div>
   )
 }
