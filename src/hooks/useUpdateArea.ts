@@ -55,7 +55,8 @@ export const useUpdateArea = () => {
       return response
     },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ["areas", "dashboard"] })
+      queryClient.invalidateQueries({ queryKey: ["areas"] })
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] })
     }
   })
 }

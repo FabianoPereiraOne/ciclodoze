@@ -5,6 +5,7 @@ import { Dashboard } from "./pages/Dashboard"
 import { Forgot } from "./pages/Forgot"
 import { Login } from "./pages/Login"
 import Goals from "./pages/Planning/Goals"
+import Plans from "./pages/Planning/Plans"
 import Tasks from "./pages/Planning/Tasks"
 import { Register } from "./pages/Register"
 import { FullAccess, Role } from "./schemas/validations/settings"
@@ -34,6 +35,10 @@ export const App = () => {
         <Route
           path='/dashboard/planejamento/tarefas'
           element={<Middleware element={<Tasks />} roles={FullAccess} />}
+        />
+        <Route
+          path='/dashboard/planejamento/planos'
+          element={<Middleware element={<Plans />} roles={FullAccess} />}
         />
 
         <Route
