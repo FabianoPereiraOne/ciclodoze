@@ -11,7 +11,8 @@ export const useCreateTask = () => {
       title,
       weekId,
       difficulty,
-      time
+      time,
+      actionPlanId
     }: CreateTaskSchemaType) => {
       const result = await fetch(`${envSchema.API_URL}/tasks`, {
         method: "POST",
@@ -19,7 +20,14 @@ export const useCreateTask = () => {
         headers: {
           "Content-type": "application/json"
         },
-        body: JSON.stringify({ day, title, weekId, difficulty, time })
+        body: JSON.stringify({
+          day,
+          title,
+          weekId,
+          difficulty,
+          time,
+          actionPlanId
+        })
       })
 
       if (!result.ok) {

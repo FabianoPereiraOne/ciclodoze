@@ -115,7 +115,7 @@ export const columns = ({
 
       return (
         <div className='flex gap-2 items-center'>
-          <Progress value={progress} className='w-[100%]' />
+          <Progress value={progress} className='w-[100%] ' />
         </div>
       )
     }

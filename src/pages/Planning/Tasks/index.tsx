@@ -75,7 +75,8 @@ export default function Tasks() {
     title,
     weekId,
     difficulty,
-    time
+    time,
+    actionPlanId
   }: CreateTaskSchemaType) => {
     try {
       const response = await mutateAsync({
@@ -83,7 +84,8 @@ export default function Tasks() {
         title,
         weekId,
         difficulty,
-        time
+        time,
+        actionPlanId
       })
       const message = response?.message
       toast.success(message)

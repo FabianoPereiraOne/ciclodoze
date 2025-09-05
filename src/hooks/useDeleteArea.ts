@@ -25,6 +25,7 @@ export const useDeleteArea = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["areas"] })
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] })
     }
   })
 }

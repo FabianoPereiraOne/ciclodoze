@@ -37,6 +37,7 @@ export const useCreateArea = () => {
     },
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["areas"] })
+      queryClient.invalidateQueries({ queryKey: ["dashboard"] })
     }
   })
 }

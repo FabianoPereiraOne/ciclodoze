@@ -16,6 +16,7 @@ import {
   SelectTrigger,
   SelectValue
 } from "@/components/ui/select"
+import { useGetActionPlans } from "@/hooks/useGetActionPlans"
 import { listDays, listDifficulties } from "@/schemas/base/weeks"
 import {
   CreateTaskSchema,
@@ -38,6 +39,16 @@ export function TaskModal({
 }: TaskModalProps) {
   const day = initialDay?.id ?? ""
   const time = initialTime ?? ""
+  const { data } = useGetActionPlans()
+  const listActions = (data ?? []).map(action => {
+    return {
+      id: action?.id,
+      value: action?.id,
+      label: action?.name
+    }
+  })
+
+  const hasListActions = listActions && listActions.length > 0
 
   const form = useForm<CreateTaskSchemaType>({
     resolver: zodResolver(CreateTaskSchema),
@@ -149,6 +160,44 @@ export function TaskModal({
                   </FormItem>
                 )}
               />
+
+              {hasListActions && (
+                <FormField
+                  control={form.control}
+                  name='actionPlanId'
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Plano de ação</FormLabel>
+                      <FormControl>
+                        <Select
+                          value={field.value}
+                          onValueChange={field.onChange}
+                        >
+                          <SelectTrigger className='w-full'>
+                            <SelectValue placeholder='Selecione um plano' />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {listActions.map((action, index) => {
+                              const id = action?.id ?? index?.toString()
+                              const label = action?.label ?? ""
+                              const value = action?.value ?? ""
+
+                              return (
+                                <SelectItem key={id} value={value}>
+                                  <div className='flex items-center gap-2'>
+                                    {label}
+                                  </div>
+                                </SelectItem>
+                              )
+                            })}
+                          </SelectContent>
+                        </Select>
+                      </FormControl>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+              )}
 
               <div className='w-full grid grid-cols-1 sm:grid-cols-2 gap-[20px]'>
                 <FormField

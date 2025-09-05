@@ -5,7 +5,8 @@ export const CreateTaskSchema = z.object({
   difficulty: z.enum(["LOW", "NORMAL", "HIGH"]).default("NORMAL").optional(),
   weekId: z.uuid(),
   day: z.string().nonempty({ error: "Dia da semana é obrigatório" }),
-  time: z.string().optional()
+  time: z.string().optional(),
+  actionPlanId: z.string().optional()
 })
 
 export const UpdateTaskSchema = z.object({
