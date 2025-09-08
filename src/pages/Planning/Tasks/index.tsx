@@ -6,7 +6,7 @@ import { listDays } from "@/schemas/base/weeks"
 import type { CreateTaskSchemaType } from "@/schemas/validations/tasks"
 import type { WeekType } from "@/types/weeks"
 import { Plus } from "lucide-react"
-import { useState } from "react"
+import { useEffect, useState } from "react"
 import { toast } from "sonner"
 import { DayTask } from "./components/DayTask"
 import { ProgressPoint } from "./components/ProgressPoint"
@@ -27,6 +27,7 @@ export default function Tasks() {
   const weeks: WeekType[] = data ?? []
   const currentWeek = weeks[currentWeekIndex]
   const today = new Date()
+  today.setHours(0, 0, 0, 0)
   const currentDayIndex = today.getDay() === 0 ? 6 : today.getDay() - 1
   const tasks = currentWeek?.tasks ?? []
 
@@ -106,6 +107,23 @@ export default function Tasks() {
     setSelectedDay({ id: "", label: "" })
     setSelectedTime("")
   }
+
+  useEffect(() => {
+    if (weeks.length > 0) {
+      const index = weeks.findIndex(week => {
+        const start = new Date(week?.startDate)
+        const end = new Date(week?.endDate)
+        start.setHours(0, 0, 0, 0)
+        end.setHours(0, 0, 0, 0)
+
+        return today >= start && today <= end
+      })
+
+      if (index !== -1) {
+        setCurrentWeekIndex(index)
+      }
+    }
+  }, [weeks])
 
   return (
     <LayoutDash
